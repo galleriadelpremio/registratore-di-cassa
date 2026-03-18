@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galleria del Premio — Corrispettivi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a18; --ink-2: #4a4a46; --ink-3: #8a8a84;
+  --paper: #f7f5f0; --paper-2: #edeae2; --paper-3: #e2ddd4;
+  --gold: #b5892a; --gold-light: #f5ecd2; --gold-dark: #9d7522;
+  --border: rgba(26,26,24,0.1); --border-med: rgba(26,26,24,0.18);
+  --green: #2d6a4f; --green-bg: #eaf4ef;
+  --blue: #1a4e7a; --blue-bg: #eaf1f8;
+  --red: #c0392b; --red-bg: #fdf0ee;
+  --sidebar-w: 230px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: 'DM Sans', sans-serif; font-weight: 400; background: var(--paper); color: var(--ink); }
+
+/* ── HEADER ── */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: var(--ink); height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem 0 calc(var(--sidebar-w) + 1.5rem);
+}
+.logo { display: flex; align-items: baseline; gap: 10px; }
+.logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+.logo-tag { font-size: 10px; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+.header-user { display: flex; align-items: center; gap: 10px; }
+.user-pill { font-size: 12px; color: rgba(255,255,255,0.5); }
+.user-pill strong { color: rgba(255,255,255,0.85); }
+#btn-logout { background: none; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.6); padding: 5px 12px; border-radius: 5px; font-size: 12px; cursor: pointer; font-family: inherit; }
+#btn-logout:hover { background: rgba(255,255,255,0.07); color: #fff; }
+
+/* ── SIDEBAR ── */
+aside {
+  position: fixed; top: 58px; left: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--ink); overflow-y: auto; z-index: 100;
+  display: flex; flex-direction: column; padding: 1.5rem 0;
+}
+.nav-group { margin-bottom: 1.5rem; }
+.nav-label { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 0 1.25rem; margin-bottom: 6px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 1.25rem; background: none; border: none;
+  color: rgba(255,255,255,0.55); font-size: 13.5px; font-family: inherit;
+  cursor: pointer; text-align: left; transition: all 0.12s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-btn.active { background: rgba(181,137,42,0.15); color: var(--gold); }
+.nav-icon { width: 18px; font-size: 14px; text-align: center; }
+.nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.5rem 1.25rem 1rem; }
+aside .footer-note { margin-top: auto; padding: 1rem 1.25rem; font-size: 11px; color: rgba(255,255,255,0.2); line-height: 1.5; }
+
+/* ── MAIN ── */
+main {
+  margin-left: var(--sidebar-w);
+  padding: 58px 0 0;
+  min-height: 100vh;
+}
+.page { display: none; padding: 2rem 2.5rem; max-width: 900px; }
+.page.active { display: block; }
+.page-head { margin-bottom: 1.75rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.page-title { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.1; }
+.page-title em { font-style: italic; color: var(--gold); }
+.page-sub { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+
+/* ── LOGIN ── */
+#login-screen {
+  position: fixed; inset: 0; background: var(--ink); z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+  background: var(--paper); border-radius: 16px;
+  padding: 2.5rem; width: 100%; max-width: 380px;
+}
+.login-logo { text-align: center; margin-bottom: 2rem; }
+.login-logo h1 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+.login-logo p { font-size: 11px; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+#login-error { background: var(--red-bg); color: var(--red); border-radius: 7px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
+
+/* ── CARDS ── */
+.card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; }
+.card-title { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; margin-bottom: 1.25rem; }
+
+/* ── FORM ── */
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; margin-bottom: 5px; }
+input, select, textarea {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--border-med); border-radius: 7px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--ink); background: var(--paper);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(181,137,42,0.1); background: #fff;
+}
+.form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 18px; border-radius: 7px; font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border-med); background: var(--paper);
+  color: var(--ink); transition: all 0.12s; white-space: nowrap;
+}
+.btn:hover { background: var(--paper-2); }
+.btn:active { transform: scale(0.98); }
+.btn-gold { background: var(--gold); color: #fff; border-color: transparent; }
+.btn-gold:hover { background: var(--gold-dark); }
+.btn-dark { background: var(--ink); color: #fff; border-color: transparent; }
+.btn-dark:hover { background: #2e2e2a; }
+.btn-ghost-red { background: transparent; color: var(--red); border-color: rgba(192,57,43,0.25); font-size: 12px; padding: 5px 10px; }
+.btn-ghost-red:hover { background: var(--red-bg); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-icon { padding: 7px 10px; font-size: 14px; }
+.btn-full { width: 100%; }
+
+/* ── PRODOTTI CASSA ── */
+.prodotti-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.prodotto-card {
+  border: 2px solid var(--border); border-radius: 10px;
+  padding: 1.25rem; cursor: pointer; transition: all 0.15s;
+  background: #fff; text-align: center;
+}
+.prodotto-card:hover { border-color: var(--gold); background: var(--gold-light); }
+.prodotto-card.selected { border-color: var(--gold); background: var(--gold-light); }
+.prodotto-nome { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+.prodotto-prezzo { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--gold); }
+.prodotto-desc { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+
+/* ── METRICS ── */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+.metric { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; }
+.metric-label { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
+.metric-value { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--ink); }
+.metric-value.gold { color: var(--gold); }
+
+/* ── TABLE ── */
+.table-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff; }
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--paper-2); }
+th { font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; }
+td { padding: 10px 14px; font-size: 13.5px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--paper); }
+.empty-row td { text-align: center; color: var(--ink-3); padding: 2.5rem; font-size: 14px; }
+
+/* ── BADGES ── */
+.badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.badge-pos { background: var(--blue-bg); color: var(--blue); }
+.badge-cash { background: var(--green-bg); color: var(--green); }
+.badge-gold { background: var(--gold-light); color: var(--gold-dark); }
+.badge-admin { background: #f0e9fb; color: #5b21b6; }
+.badge-op { background: var(--paper-2); color: var(--ink-3); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  background: var(--ink); color: #fff; padding: 12px 18px;
+  border-radius: 8px; font-size: 13.5px; max-width: 320px;
+  opacity: 0; transform: translateY(6px); transition: all 0.2s;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.success { background: var(--green); }
+#toast.error { background: var(--red); }
+
+/* ── MOBILE ── */
+@media (max-width: 680px) {
+  :root { --sidebar-w: 0px; }
+  aside { display: none; }
+  header { padding-left: 1.5rem; }
+  .page { padding: 1.5rem 1rem; }
+  .metrics { grid-template-columns: 1fr; }
+  .form-2, .form-3 { grid-template-columns: 1fr; }
+  .prodotti-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.importo-big { font-family: 'DM Serif Display', serif; font-size: 16px; }
+.muted { color: var(--ink-3); font-size: 12px; }
+.row-actions { display: flex; gap: 6px; align-items: center; }
+.filter-bar { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.filter-bar .field { margin-bottom: 0; min-width: 140px; }
+.qty-control { display: flex; align-items: center; gap: 8px; }
+.qty-control button { width: 32px; height: 32px; border: 1px solid var(--border-med); border-radius: 6px; background: var(--paper); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.qty-control span { font-size: 16px; font-weight: 500; min-width: 24px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>Galleria del Premio</h1>
+      <p>Registro Corrispettivi</p>
+    </div>
+    <div id="login-error"></div>
+    <div class="field"><label>Username</label><input type="text" id="login-user" autocomplete="username" placeholder="es. admin"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn btn-dark btn-full" style="margin-top:8px" onclick="doLogin()">Accedi</button>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<header>
+  <div class="logo">
+    <span class="logo-name">Galleria del Premio</span>
+    <span class="logo-tag">Suzzara</span>
+  </div>
+  <div class="header-user">
+    <span class="user-pill">Accesso: <strong id="header-nome">—</strong></span>
+    <button id="btn-logout" onclick="logout()">Esci</button>
+  </div>
+</header>
+
+<aside>
+  <div class="nav-group">
+    <div class="nav-label">Cassa</div>
+    <button class="nav-btn active" onclick="showPage('cassa',this)"><span class="nav-icon">🎟</span> Registra incasso</button>
+    <button class="nav-btn" onclick="showPage('storico',this)"><span class="nav-icon">📋</span> Storico</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Reportistica</div>
+    <button class="nav-btn" onclick="showPage('riepilogo',this)"><span class="nav-icon">📊</span> Riepilogo mensile</button>
+    <button class="nav-btn" onclick="showPage('esporta',this)"><span class="nav-icon">📄</span> Genera modulo</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group admin-only" style="display:none">
+    <div class="nav-label">Amministrazione</div>
+    <button class="nav-btn" onclick="showPage('prodotti',this)"><span class="nav-icon">🏷</span> Catalogo prezzi</button>
+    <button class="nav-btn" onclick="showPage('utenti',this)"><span class="nav-icon">👤</span> Utenti</button>
+  </div>
+  <div class="footer-note">Città di Suzzara<br>Prov. di Mantova</div>
+</aside>
+
+<main>
+
+<!-- ── CASSA ── -->
+<div id="page-cassa" class="page active">
+  <div class="page-head">
+    <div><h1 class="page-title">Registra <em>incasso</em></h1><p class="page-sub">Seleziona prodotto e modalità di pagamento</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Prodotti disponibili</div>
+    <div class="prodotti-grid" id="prodotti-grid"></div>
+    <div class="form-2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Quantità</label>
+        <div class="qty-control">
+          <button onclick="cambiaQty(-1)">−</button>
+          <span id="qty-val">1</span>
+          <button onclick="cambiaQty(1)">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Modalità pagamento</label>
+        <select id="modalita">
+          <option value="Contante">Contante</option>
+          <option value="POS">POS</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Data (lascia vuoto per oggi)</label>
+        <input type="date" id="cassa-data">
+      </div>
+      <div class="field">
+        <label>Note (opzionale)</label>
+        <input type="text" id="cassa-note" placeholder="es. gruppo scolastico">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+      <div style="font-size:13px;color:var(--ink-3)">Importo: <span id="importo-preview" style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)">—</span></div>
+      <button class="btn btn-gold" onclick="registraIncasso()">Registra e genera ricevuta ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STORICO ── -->
+<div id="page-storico" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Storico <em>incassi</em></h1><p class="page-sub">Tutte le registrazioni</p></div>
+  </div>
+  <div class="filter-bar">
+    <div class="field"><label>Anno</label><select id="f-anno" onchange="loadStorico()"></select></div>
+    <div class="field"><label>Mese</label><select id="f-mese" onchange="loadStorico()"></select></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>N°</th><th>Data</th><th>Prodotto</th><th>Qta</th><th>Importo</th><th>Modalità</th><th>Operatore</th><th></th></tr></thead>
+      <tbody id="tbody-storico"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── RIEPILOGO ── -->
+<div id="page-riepilogo" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Riepilogo <em>mensile</em></h1><p class="page-sub">Totali per mese</p></div>
+  </div>
+  <div class="filter-bar">
+    <div class="field"><label>Anno</label><select id="r-anno" onchange="loadRiepilogo()"></select></div>
+    <div class="field"><label>Mese</label><select id="r-mese" onchange="loadRiepilogo()"></select></div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Totale incassato</div><div class="metric-value gold" id="r-tot">—</div></div>
+    <div class="metric"><div class="metric-label">Di cui contante</div><div class="metric-value" id="r-cash">—</div></div>
+    <div class="metric"><div class="metric-label">Di cui POS</div><div class="metric-value" id="r-pos">—</div></div>
+  </div>
+  <div class="metric" style="margin-bottom:0"><div class="metric-label">Numero registrazioni</div><div class="metric-value" id="r-righe">—</div></div>
+</div>
+
+<!-- ── ESPORTA ── -->
+<div id="page-esporta" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Genera <em>modulo</em></h1><p class="page-sub">Esporta il modulo corrispettivi mensile in Excel</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Seleziona periodo</div>
+    <div class="form-2" style="max-width:380px">
+      <div class="field"><label>Anno</label><select id="e-anno"></select></div>
+      <div class="field"><label>Mese</label><select id="e-mese"></select></div>
+    </div>
+    <button class="btn btn-dark" onclick="scaricaExcel()" style="margin-top:4px">Scarica Excel ↓</button>
+  </div>
+</div>
+
+<!-- ── PRODOTTI ADMIN ── -->
+<div id="page-prodotti" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Catalogo <em>prezzi</em></h1><p class="page-sub">Gestisci i prodotti disponibili in cassa</p></div>
+    <button class="btn btn-gold" onclick="toggleFormProdotto()">+ Nuovo prodotto</button>
+  </div>
+  <div class="card" id="form-prodotto" style="display:none">
+    <div class="card-title">Nuovo prodotto</div>
+    <div class="form-2">
+      <div class="field"><label>Nome</label><input type="text" id="p-nome" placeholder="es. Catalogo mostra"></div>
+      <div class="field"><label>Prezzo (€)</label><input type="number" id="p-prezzo" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <div class="field"><label>Descrizione (opzionale)</label><input type="text" id="p-desc" placeholder="breve descrizione"></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-gold" onclick="salvaProdotto()">Salva prodotto</button>
+      <button class="btn" onclick="toggleFormProdotto()">Annulla</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>Descrizione</th><th>Prezzo</th><th>Stato</th><th></th></tr></thead>
+      <tbody id="tbody-prodotti"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── UTENTI ADMIN ── -->
+<div id="page-utenti" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Gestione <em>utenti</em></h1><p class="page-sub">Accessi al sistema</p></div>
+    <button class="btn btn-gold" onclick="toggleFormUtente()">+ Nuovo utente</button>
+  </div>
+  <div class="card" id="form-utente" style="display:none">
+    <div class="card-title">Nuovo utente</div>
+    <div class="form-3">
+      <div class="field"><label>Username</label><input type="text" id="u-user" placeholder="es. mario.rossi"></div>
+      <div class="field"><label>Nome completo</label><input type="text" id="u-nome" placeholder="es. Mario Rossi"></div>
+      <div class="field"><label>Password</label><input type="password" id="u-pass" placeholder="••••••••"></div>
+    </div>
+    <div class="field" style="max-width:200px">
+      <label>Ruolo</label>
+      <select id="u-ruolo"><option value="operatore">Operatore</option><option value="admin">Amministratore</option></select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-gold" onclick="salvaUtente()">Crea utente</button>
+      <button class="btn" onclick="toggleFormUtente()">Annulla</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>Username</th><th>Ruolo</th><th></th></tr></thead>
+      <tbody id="tbody-utenti"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<script>
+const API = '';
+let TOKEN = localStorage.getItem('gp_token') || '';
+let RUOLO = localStorage.getItem('gp_ruolo') || '';
+let NOME = localStorage.getItem('gp_nome') || '';
+let prodottoSelezionato = null;
+let qty = 1;
+
+const MESI = ['','Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+// ── UTILS ──
+function toast(msg, type='', dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', dur);
+}
+
+function fmtEur(n) {
+  return '€\u00a0' + Number(n).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function fmtData(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('it-IT');
+}
+
+async function api(method, path, body=null) {
+  const opts = {
+    method,
+    headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN}
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (res.status === 401) { logout(); return null; }
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({detail:'Errore sconosciuto'}));
+    throw new Error(err.detail || 'Errore');
+  }
+  if (res.headers.get('content-type')?.includes('application/json')) return res.json();
+  return res;
+}
+
+function fillAnni(selId) {
+  const sel = document.getElementById(selId);
+  const cur = new Date().getFullYear();
+  sel.innerHTML = '';
+  for (let y = cur; y >= cur - 3; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if (y === cur) o.selected = true;
+    sel.appendChild(o);
+  }
+}
+
+function fillMesi(selId) {
+  const sel = document.getElementById(selId);
+  const cur = new Date().getMonth() + 1;
+  sel.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = MESI[m];
+    if (m === cur) o.selected = true;
+    sel.appendChild(o);
+  }
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const user = document.getElementById('login-user').value;
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+  try {
+    const form = new URLSearchParams();
+    form.append('username', user); form.append('password', pass);
+    const res = await fetch(API + '/api/auth/login', {method:'POST', body:form});
+    if (!res.ok) { const e = await res.json(); throw new Error(e.detail); }
+    const data = await res.json();
+    TOKEN = data.access_token; RUOLO = data.ruolo; NOME = data.nome;
+    localStorage.setItem('gp_token', TOKEN);
+    localStorage.setItem('gp_ruolo', RUOLO);
+    localStorage.setItem('gp_nome', NOME);
+    avviaApp();
+  } catch(e) {
+    err.textContent = e.message; err.style.display = 'block';
+  }
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function logout() {
+  TOKEN = RUOLO = NOME = '';
+  localStorage.removeItem('gp_token');
+  localStorage.removeItem('gp_ruolo');
+  localStorage.removeItem('gp_nome');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function avviaApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('header-nome').textContent = NOME;
+  if (RUOLO === 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+  }
+  initSelectors();
+  loadProdotti();
+}
+
+function initSelectors() {
+  ['f-anno','r-anno','e-anno'].forEach(fillAnni);
+  ['f-mese','r-mese','e-mese'].forEach(fillMesi);
+}
+
+// ── NAVIGAZIONE ──
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='storico') loadStorico();
+  if (id==='riepilogo') loadRiepilogo();
+  if (id==='prodotti') loadProdottiAdmin();
+  if (id==='utenti') loadUtenti();
+}
+
+// ── CASSA ──
+async function loadProdotti() {
+  try {
+    const prodotti = await api('GET', '/api/prodotti?solo_attivi=true');
+    if (!prodotti) return;
+    const grid = document.getElementById('prodotti-grid');
+    grid.innerHTML = prodotti.map(p => `
+      <div class="prodotto-card" onclick="selezionaProdotto(${p.id}, ${p.prezzo}, this)" data-id="${p.id}">
+        <div class="prodotto-nome">${p.nome}</div>
+        <div class="prodotto-prezzo">${fmtEur(p.prezzo)}</div>
+        ${p.descrizione ? `<div class="prodotto-desc">${p.descrizione}</div>` : ''}
+      </div>`).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function selezionaProdotto(id, prezzo, el) {
+  document.querySelectorAll('.prodotto-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  prodottoSelezionato = {id, prezzo};
+  aggiornaPreview();
+}
+
+function cambiaQty(delta) {
+  qty = Math.max(1, qty + delta);
+  document.getElementById('qty-val').textContent = qty;
+  aggiornaPreview();
+}
+
+function aggiornaPreview() {
+  const el = document.getElementById('importo-preview');
+  if (prodottoSelezionato) el.textContent = fmtEur(prodottoSelezionato.prezzo * qty);
+  else el.textContent = '—';
+}
+
+async function registraIncasso() {
+  if (!prodottoSelezionato) { toast('Seleziona un prodotto', 'error'); return; }
+  const body = {
+    prodotto_id: prodottoSelezionato.id,
+    quantita: qty,
+    modalita: document.getElementById('modalita').value,
+    note: document.getElementById('cassa-note').value,
+  };
+  const data = document.getElementById('cassa-data').value;
+  if (data) body.data = data;
+  try {
+    const inc = await api('POST', '/api/incassi', body);
+    if (!inc) return;
+    toast('✓ Incasso registrato — n. ' + String(inc.numero_ricevuta).padStart(4,'0'), 'success');
+    // scarica ricevuta automaticamente
+    const res = await api('GET', `/api/incassi/${inc.id}/ricevuta`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `ricevuta_${String(inc.numero_ricevuta).padStart(4,'0')}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    // reset
+    qty = 1; document.getElementById('qty-val').textContent = '1';
+    document.getElementById('cassa-note').value = '';
+    document.getElementById('cassa-data').value = '';
+    prodottoSelezionato = null;
+    document.querySelectorAll('.prodotto-card').forEach(c => c.classList.remove('selected'));
+    aggiornaPreview();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── STORICO ──
+async function loadStorico() {
+  const anno = document.getElementById('f-anno').value;
+  const mese = document.getElementById('f-mese').value;
+  try {
+    const inc = await api('GET', `/api/incassi?anno=${anno}&mese=${mese}`);
+    if (!inc) return;
+    const tbody = document.getElementById('tbody-storico');
+    if (inc.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Nessuna registrazione per il periodo selezionato.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = inc.map(i => `
+      <tr>
+        <td class="muted">${String(i.numero_ricevuta).padStart(4,'0')}</td>
+        <td>${fmtData(i.data)}</td>
+        <td>${i.prodotto_nome}</td>
+        <td class="muted">${i.quantita}</td>
+        <td class="importo-big">${fmtEur(i.importo_totale)}</td>
+        <td><span class="badge ${i.modalita==='POS'?'badge-pos':'badge-cash'}">${i.modalita}</span></td>
+        <td class="muted">${i.operatore_nome}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-sm btn-icon" title="Scarica ricevuta" onclick="scaricaRicevuta(${i.id})">↓</button>
+            ${RUOLO==='admin' ? `<button class="btn-ghost-red btn" onclick="eliminaIncasso(${i.id})">Elimina</button>` : ''}
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function scaricaRicevuta(id) {
+  try {
+    const res = await api('GET', `/api/incassi/${id}/ricevuta`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `ricevuta_${id}.pdf`; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function eliminaIncasso(id) {
+  if (!confirm('Eliminare questa registrazione? L\'operazione è irreversibile.')) return;
+  try {
+    await api('DELETE', `/api/incassi/${id}`);
+    toast('Registrazione eliminata.');
+    loadStorico();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── RIEPILOGO ──
+async function loadRiepilogo() {
+  const anno = document.getElementById('r-anno').value;
+  const mese = document.getElementById('r-mese').value;
+  try {
+    const r = await api('GET', `/api/riepilogo?anno=${anno}&mese=${mese}`);
+    if (!r) return;
+    document.getElementById('r-tot').textContent = fmtEur(r.totale);
+    document.getElementById('r-cash').textContent = fmtEur(r.contante);
+    document.getElementById('r-pos').textContent = fmtEur(r.pos);
+    document.getElementById('r-righe').textContent = r.righe;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── EXPORT ──
+async function scaricaExcel() {
+  const anno = document.getElementById('e-anno').value;
+  const mese = document.getElementById('e-mese').value;
+  try {
+    const res = await api('GET', `/api/export/excel?anno=${anno}&mese=${mese}`);
+    if (!res) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Corrispettivi_${MESI[parseInt(mese)]}_${anno}.xlsx`; a.click();
+    URL.revokeObjectURL(url);
+    toast('✓ File scaricato.', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── PRODOTTI ADMIN ──
+async function loadProdottiAdmin() {
+  try {
+    const prodotti = await api('GET', '/api/prodotti?solo_attivi=false');
+    if (!prodotti) return;
+    const tbody = document.getElementById('tbody-prodotti');
+    tbody.innerHTML = prodotti.map(p => `
+      <tr>
+        <td><strong>${p.nome}</strong></td>
+        <td class="muted">${p.descrizione || '—'}</td>
+        <td class="importo-big">${fmtEur(p.prezzo)}</td>
+        <td><span class="badge ${p.attivo?'badge-gold':'badge-op'}">${p.attivo?'Attivo':'Disattivato'}</span></td>
+        <td>
+          ${p.attivo ? `<button class="btn-ghost-red btn" onclick="disattivaProdotto(${p.id})">Disattiva</button>` : '—'}
+        </td>
+      </tr>`).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function toggleFormProdotto() {
+  const f = document.getElementById('form-prodotto');
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+async function salvaProdotto() {
+  const nome = document.getElementById('p-nome').value;
+  const prezzo = parseFloat(document.getElementById('p-prezzo').value);
+  const desc = document.getElementById('p-desc').value;
+  if (!nome || isNaN(prezzo) || prezzo <= 0) { toast('Compila nome e prezzo.', 'error'); return; }
+  try {
+    await api('POST', '/api/prodotti', {nome, prezzo, descrizione:desc});
+    toast('✓ Prodotto aggiunto.', 'success');
+    toggleFormProdotto();
+    loadProdottiAdmin();
+    loadProdotti();
+    document.getElementById('p-nome').value = '';
+    document.getElementById('p-prezzo').value = '';
+    document.getElementById('p-desc').value = '';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function disattivaProdotto(id) {
+  if (!confirm('Disattivare questo prodotto? Non apparirà più in cassa.')) return;
+  try {
+    await api('DELETE', `/api/prodotti/${id}`);
+    toast('Prodotto disattivato.'); loadProdottiAdmin(); loadProdotti();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── UTENTI ADMIN ──
+async function loadUtenti() {
+  try {
+    const utenti = await api('GET', '/api/utenti');
+    if (!utenti) return;
+    document.getElementById('tbody-utenti').innerHTML = utenti.map(u => `
+      <tr>
+        <td><strong>${u.nome}</strong></td>
+        <td class="muted">${u.username}</td>
+        <td><span class="badge ${u.ruolo==='admin'?'badge-admin':'badge-op'}">${u.ruolo}</span></td>
+        <td>
+          ${u.username !== 'admin' ? `<button class="btn-ghost-red btn" onclick="disattivaUtente(${u.id})">Rimuovi</button>` : '<span class="muted">—</span>'}
+        </td>
+      </tr>`).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function toggleFormUtente() {
+  const f = document.getElementById('form-utente');
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+async function salvaUtente() {
+  const username = document.getElementById('u-user').value;
+  const nome = document.getElementById('u-nome').value;
+  const password = document.getElementById('u-pass').value;
+  const ruolo = document.getElementById('u-ruolo').value;
+  if (!username || !nome || !password) { toast('Compila tutti i campi.', 'error'); return; }
+  try {
+    await api('POST', '/api/utenti', {username, nome, password, ruolo});
+    toast('✓ Utente creato.', 'success');
+    toggleFormUtente();
+    loadUtenti();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function disattivaUtente(id) {
+  if (!confirm('Rimuovere questo utente?')) return;
+  try {
+    await api('DELETE', `/api/utenti/${id}`);
+    toast('Utente rimosso.'); loadUtenti();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── INIT ──
+if (TOKEN) {
+  api('GET', '/api/auth/me').then(me => {
+    if (me) { NOME = me.nome; RUOLO = me.ruolo; avviaApp(); }
+    else logout();
+  }).catch(logout);
+} else {
+  document.getElementById('login-screen').style.display = 'flex';
+}
+</script>
+</body>
+</html>
