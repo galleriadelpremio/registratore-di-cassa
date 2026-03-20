@@ -239,6 +239,7 @@ tbody tr:hover td { background: var(--paper); }
     <div class="nav-label">Amministrazione</div>
     <button class="nav-btn" onclick="showPage('prodotti',this)"><span class="nav-icon">🏷</span> Catalogo prezzi</button>
     <button class="nav-btn" onclick="showPage('utenti',this)"><span class="nav-icon">👤</span> Utenti</button>
+    <button class="nav-btn" onclick="showPage('email',this)"><span class="nav-icon">✉️</span> Email report</button>
   </div>
   <div class="footer-note">Città di Suzzara<br>Prov. di Mantova</div>
 </aside>
@@ -392,6 +393,40 @@ tbody tr:hover td { background: var(--paper); }
   </div>
 </div>
 
+<!-- ── EMAIL REPORT ── -->
+<div id="page-email" class="page">
+  <div class="page-head">
+    <div><h1 class="page-title">Email <em>report</em></h1><p class="page-sub">Test e configurazione invio automatico</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Test invio email</div>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:1rem">Invia una email di test per verificare che la configurazione funzioni correttamente. Verrà inviata a tutti i destinatari configurati.</p>
+    <button class="btn btn-gold" onclick="testEmail()">Invia email di test ↗</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Invia report manualmente</div>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:1rem">Puoi inviare i report in qualsiasi momento senza aspettare l'orario automatico.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-dark" onclick="inviaGiornaliero()">Report giornaliero di oggi ↗</button>
+      <button class="btn" onclick="inviaMensile()">Riepilogo mese corrente ↗</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Destinatari configurati</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
+        galleriapremio@comune.suzzara.it
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
+        erika.vecchietti@comune.suzzara.it
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-3);margin-top:12px">Orari automatici: ogni giorno alle 18:00 — riepilogo mensile il 28-31 di ogni mese alle 18:00</p>
+  </div>
+</div>
+
 </main>
 <div id="toast"></div>
 
@@ -519,6 +554,7 @@ function showPage(id, btn) {
   if (id==='riepilogo') loadRiepilogo();
   if (id==='prodotti') loadProdottiAdmin();
   if (id==='utenti') loadUtenti();
+  if (id==='email') {} // niente da caricare
 }
 
 // ── CASSA ──
@@ -758,6 +794,30 @@ async function disattivaUtente(id) {
   try {
     await api('DELETE', `/api/utenti/${id}`);
     toast('Utente rimosso.'); loadUtenti();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function testEmail() {
+  try {
+    const res = await api('POST', '/api/report/test');
+    if (!res) return;
+    toast(res.ok ? '✓ Email di test inviata!' : '⚠ Errore invio email.', res.ok ? 'success' : 'error');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function inviaGiornaliero() {
+  try {
+    const res = await api('POST', '/api/report/giornaliero');
+    if (!res) return;
+    toast(res.ok ? '✓ Report giornaliero inviato!' : '⚠ Errore invio.', res.ok ? 'success' : 'error');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function inviaMensile() {
+  try {
+    const res = await api('POST', '/api/report/mensile');
+    if (!res) return;
+    toast(res.ok ? '✓ Riepilogo mensile inviato!' : '⚠ Errore invio.', res.ok ? 'success' : 'error');
   } catch(e) { toast(e.message, 'error'); }
 }
 
