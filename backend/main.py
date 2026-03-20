@@ -304,3 +304,39 @@ def serve_frontend(full_path: str):
         with open(index) as f:
             return f.read()
     return HTMLResponse("<h1>Frontend non trovato</h1>", status_code=404)
+
+
+# ─── EMAIL REPORT ─────────────────────────────────────────────────────────────
+
+@app.post("/api/report/giornaliero")
+async def trigger_report_giornaliero(db: Session = Depends(get_db), _=Depends(richiedi_admin)):
+    """Endpoint chiamato da cron-job.org ogni giorno alle 18:00"""
+    from email_report import invia_report_giornaliero
+    ok = await invia_report_giornaliero(db)
+    return {"ok": ok}
+
+
+@app.post("/api/report/mensile")
+async def trigger_report_mensile(
+    anno: int = None, mese: int = None,
+    db: Session = Depends(get_db), _=Depends(richiedi_admin)
+):
+    """Endpoint chiamato da cron-job.org l'ultimo giorno del mese alle 18:00"""
+    from email_report import invia_report_mensile
+    from datetime import date
+    oggi = date.today()
+    if not anno: anno = oggi.year
+    if not mese: mese = oggi.month
+    ok = await invia_report_mensile(db, mese, anno)
+    return {"ok": ok}
+
+
+@app.post("/api/report/test")
+async def test_email(db: Session = Depends(get_db), _=Depends(richiedi_admin)):
+    """Invia una email di test per verificare la configurazione"""
+    from email_report import invia_email
+    ok = invia_email(
+        "Test configurazione email — Galleria del Premio",
+        "<div style='font-family:Arial;padding:20px'><h2>Email di test</h2><p>La configurazione email funziona correttamente.</p></div>"
+    )
+    return {"ok": ok}

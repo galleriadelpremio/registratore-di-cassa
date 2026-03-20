@@ -9,3 +9,5 @@ services:
     envVars:
       - key: SECRET_KEY
         generateValue: true
+      - key: RESEND_API_KEY
+        sync: false
