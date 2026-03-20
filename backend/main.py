@@ -340,3 +340,25 @@ async def test_email(db: Session = Depends(get_db), _=Depends(richiedi_admin)):
         "<div style='font-family:Arial;padding:20px'><h2>Email di test</h2><p>La configurazione email funziona correttamente.</p></div>"
     )
     return {"ok": ok}
+
+
+# ─── CRON JOB ENDPOINTS (autenticazione tramite CRON_SECRET) ─────────────────
+
+@app.post("/api/cron/giornaliero")
+async def cron_giornaliero(secret: str, db: Session = Depends(get_db)):
+    if secret != os.getenv("CRON_SECRET", ""):
+        raise HTTPException(status_code=403, detail="Non autorizzato.")
+    from email_report import invia_report_giornaliero
+    ok = await invia_report_giornaliero(db)
+    return {"ok": ok}
+
+
+@app.post("/api/cron/mensile")
+async def cron_mensile(secret: str, db: Session = Depends(get_db)):
+    if secret != os.getenv("CRON_SECRET", ""):
+        raise HTTPException(status_code=403, detail="Non autorizzato.")
+    from email_report import invia_report_mensile
+    from datetime import date
+    oggi = date.today()
+    ok = await invia_report_mensile(db, oggi.month, oggi.year)
+    return {"ok": ok}
