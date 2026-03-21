@@ -16,7 +16,7 @@ DESTINATARI = [
     "galleriapremio@comune.suzzara.it",
     "erika.vecchietti@comune.suzzara.it",
 ]
-MITTENTE = "onboarding@resend.dev"
+MITTENTE = "incassi@premiosuzzara.it"
 
 
 def fmteur(n):
