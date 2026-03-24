@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 import os
@@ -129,8 +129,7 @@ def registra_incasso(data: IncassoIn, db: Session = Depends(get_db), utente: Ute
     if data.modalita not in ("Contante", "POS"):
         raise HTTPException(400, "Modalità deve essere 'Contante' o 'POS'.")
 
-    tz_italia = timezone(timedelta(hours=1))
-    now = datetime.now(tz_italia).replace(tzinfo=None)
+    now = datetime.utcnow()
     data_incasso = datetime.fromisoformat(data.data) if data.data else now
     anno = data_incasso.year
     numero = prossimo_numero(db, anno)
@@ -202,6 +201,26 @@ def elimina_incasso(inc_id: int, db: Session = Depends(get_db), _=Depends(richie
     if not inc:
         raise HTTPException(404, "Registrazione non trovata.")
     db.delete(inc)
+    db.commit()
+    return {"ok": True}
+
+
+class AggiornamentoData(BaseModel):
+    data: str
+
+
+@app.put("/api/incassi/{inc_id}/data")
+def aggiorna_data_incasso(inc_id: int, body: AggiornamentoData, db: Session = Depends(get_db), _=Depends(richiedi_admin)):
+    inc = db.query(Incasso).filter(Incasso.id == inc_id).first()
+    if not inc:
+        raise HTTPException(404, "Registrazione non trovata.")
+    try:
+        nuova_data = datetime.fromisoformat(body.data)
+    except ValueError:
+        raise HTTPException(400, "Formato data non valido. Usa YYYY-MM-DD.")
+    inc.data = nuova_data
+    inc.anno = nuova_data.year
+    inc.mese = nuova_data.month
     db.commit()
     return {"ok": True}
 
@@ -340,26 +359,4 @@ async def test_email(db: Session = Depends(get_db), _=Depends(richiedi_admin)):
         "Test configurazione email — Galleria del Premio",
         "<div style='font-family:Arial;padding:20px'><h2>Email di test</h2><p>La configurazione email funziona correttamente.</p></div>"
     )
-    return {"ok": ok}
-
-
-# ─── CRON JOB ENDPOINTS (autenticazione tramite CRON_SECRET) ─────────────────
-
-@app.post("/api/cron/giornaliero")
-async def cron_giornaliero(secret: str, db: Session = Depends(get_db)):
-    if secret != os.getenv("CRON_SECRET", ""):
-        raise HTTPException(status_code=403, detail="Non autorizzato.")
-    from email_report import invia_report_giornaliero
-    ok = await invia_report_giornaliero(db)
-    return {"ok": ok}
-
-
-@app.post("/api/cron/mensile")
-async def cron_mensile(secret: str, db: Session = Depends(get_db)):
-    if secret != os.getenv("CRON_SECRET", ""):
-        raise HTTPException(status_code=403, detail="Non autorizzato.")
-    from email_report import invia_report_mensile
-    from datetime import date
-    oggi = date.today()
-    ok = await invia_report_mensile(db, oggi.month, oggi.year)
     return {"ok": ok}
