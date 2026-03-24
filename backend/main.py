@@ -129,7 +129,8 @@ def registra_incasso(data: IncassoIn, db: Session = Depends(get_db), utente: Ute
     if data.modalita not in ("Contante", "POS"):
         raise HTTPException(400, "Modalità deve essere 'Contante' o 'POS'.")
 
-    now = datetime.utcnow()
+    tz_italia = timezone(timedelta(hours=1))
+    now = datetime.now(tz_italia).replace(tzinfo=None)
     data_incasso = datetime.fromisoformat(data.data) if data.data else now
     anno = data_incasso.year
     numero = prossimo_numero(db, anno)
