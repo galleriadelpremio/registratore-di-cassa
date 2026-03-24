@@ -13,8 +13,8 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 DESTINATARI = [
-    "galleriapremio@comune.suzzara.it",
-    "erika.vecchietti@comune.suzzara.it",
+    "galleriapremio@comune.suzzara.mn.it",
+    "erika.vecchietti@comune.suzzara.mn.it",
 ]
 MITTENTE = "onboarding@resend.dev"
 
