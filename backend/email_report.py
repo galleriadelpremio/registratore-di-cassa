@@ -310,47 +310,34 @@ def genera_pdf_mensile(incassi: list, mese: int, anno: int) -> bytes:
 
 
 def invia_email(oggetto: str, corpo_html: str, allegati: list = None) -> bool:
-    """Invia email via Resend API. allegati = [{'nome': 'file.pdf', 'contenuto': bytes}]"""
     if not RESEND_API_KEY:
         print("RESEND_API_KEY non configurata")
         return False
-
-    import base64
-    attachments = []
-    if allegati:
-        for a in allegati:
-            attachments.append({
-                "filename": a['nome'],
-                "content": base64.b64encode(a['contenuto']).decode('utf-8'),
-            })
-
-    payload = {
-        "from": f"Galleria del Premio <{MITTENTE}>",
-        "to": DESTINATARI,
-        "subject": oggetto,
-        "html": corpo_html,
-    }
-    if attachments:
-        payload["attachments"] = attachments
-
-    data = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=data,
-        headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
     try:
-        with urllib.request.urlopen(req) as resp:
-            print(f"Email inviata: {resp.status}")
-            return True
-    except urllib.error.HTTPError as e:
-        print(f"Errore invio email: {e.code} — {e.read().decode()}")
+        import resend
+        resend.api_key = RESEND_API_KEY
+        import base64
+        attachments = []
+        if allegati:
+            for a in allegati:
+                attachments.append({
+                    "filename": a['nome'],
+                    "content": list(a['contenuto']),
+                })
+        params = {
+            "from": f"Galleria del Premio <{MITTENTE}>",
+            "to": DESTINATARI,
+            "subject": oggetto,
+            "html": corpo_html,
+        }
+        if attachments:
+            params["attachments"] = attachments
+        email = resend.Emails.send(params)
+        print(f"Email inviata: {email}")
+        return True
+    except Exception as e:
+        print(f"Errore invio email: {e}")
         return False
-
 
 def html_giornaliero(incassi: list, data: date) -> str:
     tot = sum(i['importo_totale'] for i in incassi)
