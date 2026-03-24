@@ -416,11 +416,11 @@ tbody tr:hover td { background: var(--paper); }
     <div style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
         <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        galleriapremio@comune.suzzara.mn.it
+        galleriapremio@comune.suzzara.it
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
         <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        erika.vecchietti@comune.suzzara.mn.it
+        erika.vecchietti@comune.suzzara.it
       </div>
     </div>
     <p style="font-size:12px;color:var(--ink-3);margin-top:12px">Orari automatici: ogni giorno alle 18:00 — riepilogo mensile il 28-31 di ogni mese alle 18:00</p>
@@ -428,6 +428,21 @@ tbody tr:hover td { background: var(--paper); }
 </div>
 
 </main>
+<div id="modal-data" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;">
+  <div style="background:var(--paper);border-radius:var(--border-radius-lg);padding:1.5rem;width:100%;max-width:340px;margin:1rem;">
+    <h3 style="font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:1rem">Modifica data</h3>
+    <input type="hidden" id="modal-data-id">
+    <div class="field">
+      <label>Nuova data</label>
+      <input type="date" id="modal-data-input">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:1rem">
+      <button class="btn btn-gold" onclick="salvaModificaData()">Salva</button>
+      <button class="btn" onclick="chiudiModificaData()">Annulla</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -647,6 +662,7 @@ async function loadStorico() {
         <td>
           <div class="row-actions">
             <button class="btn btn-sm btn-icon" title="Scarica ricevuta" onclick="scaricaRicevuta(${i.id})">↓</button>
+            ${RUOLO==='admin' ? `<button class="btn btn-sm" title="Modifica data" onclick="apriModificaData(${i.id}, '${i.data.slice(0,10)}')">📅</button>` : ''}
             ${RUOLO==='admin' ? `<button class="btn-ghost-red btn" onclick="eliminaIncasso(${i.id})">Elimina</button>` : ''}
           </div>
         </td>
@@ -670,6 +686,28 @@ async function eliminaIncasso(id) {
   try {
     await api('DELETE', `/api/incassi/${id}`);
     toast('Registrazione eliminata.');
+    loadStorico();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function apriModificaData(id, dataAttuale) {
+  document.getElementById('modal-data-id').value = id;
+  document.getElementById('modal-data-input').value = dataAttuale;
+  document.getElementById('modal-data').style.display = 'flex';
+}
+
+function chiudiModificaData() {
+  document.getElementById('modal-data').style.display = 'none';
+}
+
+async function salvaModificaData() {
+  const id = document.getElementById('modal-data-id').value;
+  const nuovaData = document.getElementById('modal-data-input').value;
+  if (!nuovaData) { toast('Inserisci una data valida.', 'error'); return; }
+  try {
+    await api('PUT', `/api/incassi/${id}/data`, { data: nuovaData });
+    toast('✓ Data aggiornata.', 'success');
+    chiudiModificaData();
     loadStorico();
   } catch(e) { toast(e.message, 'error'); }
 }
