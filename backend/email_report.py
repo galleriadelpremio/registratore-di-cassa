@@ -16,7 +16,7 @@ DESTINATARI = [
     "galleriapremio@comune.suzzara.it",
     "erika.vecchietti@comune.suzzara.it",
 ]
-MITTENTE = "incassi@premiosuzzara.it"
+MITTENTE = "onboarding@resend.dev"
 
 
 def fmteur(n):
@@ -368,47 +368,53 @@ def html_giornaliero(incassi: list, data: date) -> str:
           <td style="padding:6px 12px;border-bottom:1px solid #f0ece4">{i['modalita']}</td>
         </tr>"""
 
-    return f"""
-    <div style="font-family:'DM Sans',Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f5f0;padding:20px">
-      <div style="background:#1a1a18;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-        <p style="color:#b5892a;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px">Città di Suzzara</p>
-        <h1 style="color:#fff;font-size:20px;margin:0">Galleria del Premio</h1>
-        <p style="color:rgba(255,255,255,.5);font-size:12px;margin:4px 0 0">Report giornaliero — {data.strftime('%d/%m/%Y')}</p>
-      </div>
-      <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">Totale</p>
-            <p style="font-size:20px;font-weight:700;color:#b5892a;margin:0">{fmteur(tot)}</p>
-          </div>
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">Contante</p>
-            <p style="font-size:18px;font-weight:700;color:#2d6a4f;margin:0">{fmteur(cont)}</p>
-          </div>
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">POS</p>
-            <p style="font-size:18px;font-weight:700;color:#1a4e7a;margin:0">{fmteur(pos)}</p>
-          </div>
-        </div>
-        {'<p style="color:#9a9a94;text-align:center;font-size:14px">Nessun incasso registrato oggi.</p>' if not incassi else f'''
+    data_str = data.strftime('%d/%m/%Y')
+    if not incassi:
+        tabella = '<p style="color:#9a9a94;text-align:center;font-size:14px">Nessun incasso registrato oggi.</p>'
+    else:
+        tabella = f"""
         <table style="width:100%;border-collapse:collapse;font-size:13px">
           <thead>
             <tr style="background:#f0ece4">
-              <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">N°</th>
+              <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">N.</th>
               <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">Prodotto</th>
               <th style="padding:8px 12px;text-align:center;font-size:11px;color:#9a9a94;font-weight:500">Qta</th>
               <th style="padding:8px 12px;text-align:right;font-size:11px;color:#9a9a94;font-weight:500">Importo</th>
-              <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">Modalita\'</th>
+              <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">Modalita</th>
             </tr>
           </thead>
           <tbody>{righe_det}</tbody>
-        </table>'''}
-        <p style="font-size:11px;color:#c0c0b8;text-align:center;margin-top:24px">
-          Report automatico — Galleria del Premio, Suzzara<br>
-          Documento non fiscale — uso interno
-        </p>
-      </div>
-    </div>"""
+        </table>"""
+    tot_str = fmteur(tot)
+    cont_str = fmteur(cont)
+    pos_str = fmteur(pos)
+    return (
+        '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f5f0;padding:20px">'
+        '<div style="background:#1a1a18;padding:24px;border-radius:12px 12px 0 0;text-align:center">'
+        '<p style="color:#b5892a;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px">Citta di Suzzara</p>'
+        '<h1 style="color:#fff;font-size:20px;margin:0">Galleria del Premio</h1>'
+        f'<p style="color:rgba(255,255,255,.5);font-size:12px;margin:4px 0 0">Report giornaliero - {data_str}</p>'
+        '</div>'
+        '<div style="background:#fff;padding:24px;border-radius:0 0 12px 12px">'
+        '<div style="display:flex;gap:12px;margin-bottom:24px">'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">Totale</p>'
+        f'<p style="font-size:20px;font-weight:700;color:#b5892a;margin:0">{tot_str}</p>'
+        '</div>'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">Contante</p>'
+        f'<p style="font-size:18px;font-weight:700;color:#2d6a4f;margin:0">{cont_str}</p>'
+        '</div>'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">POS</p>'
+        f'<p style="font-size:18px;font-weight:700;color:#1a4e7a;margin:0">{pos_str}</p>'
+        '</div></div>'
+        + tabella +
+        '<p style="font-size:11px;color:#c0c0b8;text-align:center;margin-top:24px">'
+        'Report automatico - Galleria del Premio, Suzzara<br>'
+        'Documento non fiscale - uso interno'
+        '</p></div></div>'
+    )
 
 
 def html_mensile(incassi: list, mese: int, anno: int) -> str:
@@ -435,44 +441,42 @@ def html_mensile(incassi: list, mese: int, anno: int) -> str:
           <td style="padding:8px 12px;border-bottom:1px solid #f0ece4;text-align:right;font-weight:600;color:#b5892a">{fmteur(v['imp'])}</td>
         </tr>"""
 
-    return f"""
-    <div style="font-family:'DM Sans',Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f5f0;padding:20px">
-      <div style="background:#1a1a18;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-        <p style="color:#b5892a;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px">Citta\' di Suzzara</p>
-        <h1 style="color:#fff;font-size:20px;margin:0">Galleria del Premio</h1>
-        <p style="color:rgba(255,255,255,.5);font-size:12px;margin:4px 0 0">Riepilogo mensile — {MESI[mese]} {anno}</p>
-      </div>
-      <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">Totale mese</p>
-            <p style="font-size:20px;font-weight:700;color:#b5892a;margin:0">{fmteur(tot)}</p>
-          </div>
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">Contante</p>
-            <p style="font-size:18px;font-weight:700;color:#2d6a4f;margin:0">{fmteur(cont)}</p>
-          </div>
-          <div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center">
-            <p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em">POS</p>
-            <p style="font-size:18px;font-weight:700;color:#1a4e7a;margin:0">{fmteur(pos)}</p>
-          </div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead>
-            <tr style="background:#f0ece4">
-              <th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">Prodotto</th>
-              <th style="padding:8px 12px;text-align:center;font-size:11px;color:#9a9a94;font-weight:500">Quantita\'</th>
-              <th style="padding:8px 12px;text-align:right;font-size:11px;color:#9a9a94;font-weight:500">Totale</th>
-            </tr>
-          </thead>
-          <tbody>{righe_prod}</tbody>
-        </table>
-        <p style="font-size:11px;color:#c0c0b8;text-align:center;margin-top:24px">
-          Report automatico — Galleria del Premio, Suzzara<br>
-          Il modulo corrispettivi Excel e\' allegato a questa email.
-        </p>
-      </div>
-    </div>"""
+    mese_str = MESI[mese]
+    tot_str = fmteur(tot)
+    cont_str = fmteur(cont)
+    pos_str = fmteur(pos)
+    return (
+        '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f5f0;padding:20px">'
+        '<div style="background:#1a1a18;padding:24px;border-radius:12px 12px 0 0;text-align:center">'
+        '<p style="color:#b5892a;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px">Citta di Suzzara</p>'
+        '<h1 style="color:#fff;font-size:20px;margin:0">Galleria del Premio</h1>'
+        f'<p style="color:rgba(255,255,255,.5);font-size:12px;margin:4px 0 0">Riepilogo mensile - {mese_str} {anno}</p>'
+        '</div>'
+        '<div style="background:#fff;padding:24px;border-radius:0 0 12px 12px">'
+        '<div style="display:flex;gap:12px;margin-bottom:24px">'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">Totale mese</p>'
+        f'<p style="font-size:20px;font-weight:700;color:#b5892a;margin:0">{tot_str}</p>'
+        '</div>'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">Contante</p>'
+        f'<p style="font-size:18px;font-weight:700;color:#2d6a4f;margin:0">{cont_str}</p>'
+        '</div>'
+        '<div style="background:#f7f5f0;padding:16px;border-radius:8px;text-align:center;flex:1">'
+        '<p style="font-size:11px;color:#9a9a94;margin:0 0 4px;text-transform:uppercase">POS</p>'
+        f'<p style="font-size:18px;font-weight:700;color:#1a4e7a;margin:0">{pos_str}</p>'
+        '</div></div>'
+        f'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+        '<thead><tr style="background:#f0ece4">'
+        '<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9a9a94;font-weight:500">Prodotto</th>'
+        '<th style="padding:8px 12px;text-align:center;font-size:11px;color:#9a9a94;font-weight:500">Quantita</th>'
+        '<th style="padding:8px 12px;text-align:right;font-size:11px;color:#9a9a94;font-weight:500">Totale</th>'
+        f'</tr></thead><tbody>{righe_prod}</tbody></table>'
+        '<p style="font-size:11px;color:#c0c0b8;text-align:center;margin-top:24px">'
+        'Report automatico - Galleria del Premio, Suzzara<br>'
+        'Il modulo corrispettivi Excel e allegato a questa email.'
+        '</p></div></div>'
+    )
 
 
 async def invia_report_giornaliero(db):
