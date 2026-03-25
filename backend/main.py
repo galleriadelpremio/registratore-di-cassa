@@ -15,6 +15,9 @@ from ricevuta import genera_ricevuta_pdf
 from modulo_excel import genera_modulo_excel
 
 app = FastAPI(title="Galleria del Premio — Registro Corrispettivi")
+@app.get("/ping")
+def ping():
+    return {"ok": True}
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
