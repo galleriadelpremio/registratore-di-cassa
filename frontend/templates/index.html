@@ -57,11 +57,7 @@ aside {
 aside .footer-note { margin-top: auto; padding: 1rem 1.25rem; font-size: 11px; color: rgba(255,255,255,0.2); line-height: 1.5; }
 
 /* ── MAIN ── */
-main {
-  margin-left: var(--sidebar-w);
-  padding: 58px 0 0;
-  min-height: 100vh;
-}
+main { margin-left: var(--sidebar-w); padding: 58px 0 0; min-height: 100vh; }
 .page { display: none; padding: 2rem 2.5rem; max-width: 900px; }
 .page.active { display: block; }
 .page-head { margin-bottom: 1.75rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -74,10 +70,7 @@ main {
   position: fixed; inset: 0; background: var(--ink); z-index: 999;
   display: flex; align-items: center; justify-content: center;
 }
-.login-box {
-  background: var(--paper); border-radius: 16px;
-  padding: 2.5rem; width: 100%; max-width: 380px;
-}
+.login-box { background: var(--paper); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 380px; }
 .login-logo { text-align: center; margin-bottom: 2rem; }
 .login-logo h1 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
 .login-logo p { font-size: 11px; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
@@ -239,7 +232,6 @@ tbody tr:hover td { background: var(--paper); }
     <div class="nav-label">Amministrazione</div>
     <button class="nav-btn" onclick="showPage('prodotti',this)"><span class="nav-icon">🏷</span> Catalogo prezzi</button>
     <button class="nav-btn" onclick="showPage('utenti',this)"><span class="nav-icon">👤</span> Utenti</button>
-    <button class="nav-btn" onclick="showPage('email',this)"><span class="nav-icon">✉️</span> Email report</button>
   </div>
   <div class="footer-note">Città di Suzzara<br>Prov. di Mantova</div>
 </aside>
@@ -325,7 +317,7 @@ tbody tr:hover td { background: var(--paper); }
 <!-- ── ESPORTA ── -->
 <div id="page-esporta" class="page">
   <div class="page-head">
-    <div><h1 class="page-title">Genera <em>modulo</em></h1><p class="page-sub">Esporta il modulo corrispettivi mensile in Excel</p></div>
+    <div><h1 class="page-title">Genera <em>modulo</em></h1><p class="page-sub">Esporta il modulo corrispettivi mensile e le ricevute</p></div>
   </div>
   <div class="card">
     <div class="card-title">Seleziona periodo</div>
@@ -333,7 +325,10 @@ tbody tr:hover td { background: var(--paper); }
       <div class="field"><label>Anno</label><select id="e-anno"></select></div>
       <div class="field"><label>Mese</label><select id="e-mese"></select></div>
     </div>
-    <button class="btn btn-dark" onclick="scaricaExcel()" style="margin-top:4px">Scarica Excel ↓</button>
+    <div style="display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap">
+      <button class="btn btn-dark" onclick="scaricaExcel()">Scarica Excel corrispettivi ↓</button>
+      <button class="btn btn-gold" onclick="scaricaRicevuteMensili()">Scarica ricevute PDF ↓</button>
+    </div>
   </div>
 </div>
 
@@ -393,43 +388,10 @@ tbody tr:hover td { background: var(--paper); }
   </div>
 </div>
 
-<!-- ── EMAIL REPORT ── -->
-<div id="page-email" class="page">
-  <div class="page-head">
-    <div><h1 class="page-title">Email <em>report</em></h1><p class="page-sub">Test e configurazione invio automatico</p></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Test invio email</div>
-    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:1rem">Invia una email di test per verificare che la configurazione funzioni correttamente. Verrà inviata a tutti i destinatari configurati.</p>
-    <button class="btn btn-gold" onclick="testEmail()">Invia email di test ↗</button>
-  </div>
-  <div class="card">
-    <div class="card-title">Invia report manualmente</div>
-    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:1rem">Puoi inviare i report in qualsiasi momento senza aspettare l'orario automatico.</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-dark" onclick="inviaGiornaliero()">Report giornaliero di oggi ↗</button>
-      <button class="btn" onclick="inviaMensile()">Riepilogo mese corrente ↗</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Destinatari configurati</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
-        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        galleriapremio@comune.suzzara.it
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px">
-        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        erika.vecchietti@comune.suzzara.it
-      </div>
-    </div>
-    <p style="font-size:12px;color:var(--ink-3);margin-top:12px">Orari automatici: ogni giorno alle 18:00 — riepilogo mensile il 28-31 di ogni mese alle 18:00</p>
-  </div>
-</div>
-
 </main>
+
 <div id="modal-data" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;">
-  <div style="background:var(--paper);border-radius:var(--border-radius-lg);padding:1.5rem;width:100%;max-width:340px;margin:1rem;">
+  <div style="background:var(--paper);border-radius:12px;padding:1.5rem;width:100%;max-width:340px;margin:1rem;">
     <h3 style="font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:1rem">Modifica data</h3>
     <input type="hidden" id="modal-data-id">
     <div class="field">
@@ -449,7 +411,7 @@ tbody tr:hover td { background: var(--paper); }
 const API = '';
 let TOKEN = localStorage.getItem('gp_token') || '';
 let RUOLO = localStorage.getItem('gp_ruolo') || '';
-let NOME = localStorage.getItem('gp_nome') || '';
+let NOME  = localStorage.getItem('gp_nome')  || '';
 let prodottoSelezionato = null;
 let qty = 1;
 
@@ -468,15 +430,11 @@ function fmtEur(n) {
 
 function fmtData(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString('it-IT');
+  return new Date(iso).toLocaleDateString('it-IT');
 }
 
 async function api(method, path, body=null) {
-  const opts = {
-    method,
-    headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN}
-  };
+  const opts = { method, headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN} };
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(API + path, opts);
   if (res.status === 401) { logout(); return null; }
@@ -516,7 +474,7 @@ function fillMesi(selId) {
 async function doLogin() {
   const user = document.getElementById('login-user').value;
   const pass = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-error');
+  const err  = document.getElementById('login-error');
   err.style.display = 'none';
   try {
     const form = new URLSearchParams();
@@ -527,11 +485,9 @@ async function doLogin() {
     TOKEN = data.access_token; RUOLO = data.ruolo; NOME = data.nome;
     localStorage.setItem('gp_token', TOKEN);
     localStorage.setItem('gp_ruolo', RUOLO);
-    localStorage.setItem('gp_nome', NOME);
+    localStorage.setItem('gp_nome',  NOME);
     avviaApp();
-  } catch(e) {
-    err.textContent = e.message; err.style.display = 'block';
-  }
+  } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
 document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -565,11 +521,10 @@ function showPage(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  if (id==='storico') loadStorico();
+  if (id==='storico')  loadStorico();
   if (id==='riepilogo') loadRiepilogo();
   if (id==='prodotti') loadProdottiAdmin();
-  if (id==='utenti') loadUtenti();
-  if (id==='email') {} // niente da caricare
+  if (id==='utenti')   loadUtenti();
 }
 
 // ── CASSA ──
@@ -577,8 +532,7 @@ async function loadProdotti() {
   try {
     const prodotti = await api('GET', '/api/prodotti?solo_attivi=true');
     if (!prodotti) return;
-    const grid = document.getElementById('prodotti-grid');
-    grid.innerHTML = prodotti.map(p => `
+    document.getElementById('prodotti-grid').innerHTML = prodotti.map(p => `
       <div class="prodotto-card" onclick="selezionaProdotto(${p.id}, ${p.prezzo}, this)" data-id="${p.id}">
         <div class="prodotto-nome">${p.nome}</div>
         <div class="prodotto-prezzo">${fmtEur(p.prezzo)}</div>
@@ -602,8 +556,7 @@ function cambiaQty(delta) {
 
 function aggiornaPreview() {
   const el = document.getElementById('importo-preview');
-  if (prodottoSelezionato) el.textContent = fmtEur(prodottoSelezionato.prezzo * qty);
-  else el.textContent = '—';
+  el.textContent = prodottoSelezionato ? fmtEur(prodottoSelezionato.prezzo * qty) : '—';
 }
 
 async function registraIncasso() {
@@ -620,15 +573,12 @@ async function registraIncasso() {
     const inc = await api('POST', '/api/incassi', body);
     if (!inc) return;
     toast('✓ Incasso registrato — n. ' + String(inc.numero_ricevuta).padStart(4,'0'), 'success');
-    // scarica ricevuta automaticamente
     const res = await api('GET', `/api/incassi/${inc.id}/ricevuta`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `ricevuta_${String(inc.numero_ricevuta).padStart(4,'0')}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-    // reset
+    a.click(); URL.revokeObjectURL(url);
     qty = 1; document.getElementById('qty-val').textContent = '1';
     document.getElementById('cassa-note').value = '';
     document.getElementById('cassa-data').value = '';
@@ -719,9 +669,9 @@ async function loadRiepilogo() {
   try {
     const r = await api('GET', `/api/riepilogo?anno=${anno}&mese=${mese}`);
     if (!r) return;
-    document.getElementById('r-tot').textContent = fmtEur(r.totale);
+    document.getElementById('r-tot').textContent  = fmtEur(r.totale);
     document.getElementById('r-cash').textContent = fmtEur(r.contante);
-    document.getElementById('r-pos').textContent = fmtEur(r.pos);
+    document.getElementById('r-pos').textContent  = fmtEur(r.pos);
     document.getElementById('r-righe').textContent = r.righe;
   } catch(e) { toast(e.message, 'error'); }
 }
@@ -736,9 +686,24 @@ async function scaricaExcel() {
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `Corrispettivi_${MESI[parseInt(mese)]}_${anno}.xlsx`; a.click();
-    URL.revokeObjectURL(url);
-    toast('✓ File scaricato.', 'success');
+    a.href = url; a.download = `Corrispettivi_${MESI[parseInt(mese)]}_${anno}.xlsx`;
+    a.click(); URL.revokeObjectURL(url);
+    toast('✓ Excel scaricato.', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function scaricaRicevuteMensili() {
+  const anno = document.getElementById('e-anno').value;
+  const mese = document.getElementById('e-mese').value;
+  try {
+    const res = await api('GET', `/api/export/ricevute?anno=${anno}&mese=${mese}`);
+    if (!res) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Ricevute_${MESI[parseInt(mese)]}_${anno}.pdf`;
+    a.click(); URL.revokeObjectURL(url);
+    toast('✓ Ricevute scaricate.', 'success');
   } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -747,16 +712,13 @@ async function loadProdottiAdmin() {
   try {
     const prodotti = await api('GET', '/api/prodotti?solo_attivi=false');
     if (!prodotti) return;
-    const tbody = document.getElementById('tbody-prodotti');
-    tbody.innerHTML = prodotti.map(p => `
+    document.getElementById('tbody-prodotti').innerHTML = prodotti.map(p => `
       <tr>
         <td><strong>${p.nome}</strong></td>
         <td class="muted">${p.descrizione || '—'}</td>
         <td class="importo-big">${fmtEur(p.prezzo)}</td>
         <td><span class="badge ${p.attivo?'badge-gold':'badge-op'}">${p.attivo?'Attivo':'Disattivato'}</span></td>
-        <td>
-          ${p.attivo ? `<button class="btn-ghost-red btn" onclick="disattivaProdotto(${p.id})">Disattiva</button>` : '—'}
-        </td>
+        <td>${p.attivo ? `<button class="btn-ghost-red btn" onclick="disattivaProdotto(${p.id})">Disattiva</button>` : '—'}</td>
       </tr>`).join('');
   } catch(e) { toast(e.message, 'error'); }
 }
@@ -767,16 +729,14 @@ function toggleFormProdotto() {
 }
 
 async function salvaProdotto() {
-  const nome = document.getElementById('p-nome').value;
+  const nome   = document.getElementById('p-nome').value;
   const prezzo = parseFloat(document.getElementById('p-prezzo').value);
-  const desc = document.getElementById('p-desc').value;
+  const desc   = document.getElementById('p-desc').value;
   if (!nome || isNaN(prezzo) || prezzo <= 0) { toast('Compila nome e prezzo.', 'error'); return; }
   try {
     await api('POST', '/api/prodotti', {nome, prezzo, descrizione:desc});
     toast('✓ Prodotto aggiunto.', 'success');
-    toggleFormProdotto();
-    loadProdottiAdmin();
-    loadProdotti();
+    toggleFormProdotto(); loadProdottiAdmin(); loadProdotti();
     document.getElementById('p-nome').value = '';
     document.getElementById('p-prezzo').value = '';
     document.getElementById('p-desc').value = '';
@@ -801,9 +761,7 @@ async function loadUtenti() {
         <td><strong>${u.nome}</strong></td>
         <td class="muted">${u.username}</td>
         <td><span class="badge ${u.ruolo==='admin'?'badge-admin':'badge-op'}">${u.ruolo}</span></td>
-        <td>
-          ${u.username !== 'admin' ? `<button class="btn-ghost-red btn" onclick="disattivaUtente(${u.id})">Rimuovi</button>` : '<span class="muted">—</span>'}
-        </td>
+        <td>${u.username !== 'admin' ? `<button class="btn-ghost-red btn" onclick="disattivaUtente(${u.id})">Rimuovi</button>` : '<span class="muted">—</span>'}</td>
       </tr>`).join('');
   } catch(e) { toast(e.message, 'error'); }
 }
@@ -815,15 +773,14 @@ function toggleFormUtente() {
 
 async function salvaUtente() {
   const username = document.getElementById('u-user').value;
-  const nome = document.getElementById('u-nome').value;
+  const nome     = document.getElementById('u-nome').value;
   const password = document.getElementById('u-pass').value;
-  const ruolo = document.getElementById('u-ruolo').value;
+  const ruolo    = document.getElementById('u-ruolo').value;
   if (!username || !nome || !password) { toast('Compila tutti i campi.', 'error'); return; }
   try {
     await api('POST', '/api/utenti', {username, nome, password, ruolo});
     toast('✓ Utente creato.', 'success');
-    toggleFormUtente();
-    loadUtenti();
+    toggleFormUtente(); loadUtenti();
   } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -832,30 +789,6 @@ async function disattivaUtente(id) {
   try {
     await api('DELETE', `/api/utenti/${id}`);
     toast('Utente rimosso.'); loadUtenti();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function testEmail() {
-  try {
-    const res = await api('POST', '/api/report/test');
-    if (!res) return;
-    toast(res.ok ? '✓ Email di test inviata!' : '⚠ Errore invio email.', res.ok ? 'success' : 'error');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function inviaGiornaliero() {
-  try {
-    const res = await api('POST', '/api/report/giornaliero');
-    if (!res) return;
-    toast(res.ok ? '✓ Report giornaliero inviato!' : '⚠ Errore invio.', res.ok ? 'success' : 'error');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function inviaMensile() {
-  try {
-    const res = await api('POST', '/api/report/mensile');
-    if (!res) return;
-    toast(res.ok ? '✓ Riepilogo mensile inviato!' : '⚠ Errore invio.', res.ok ? 'success' : 'error');
   } catch(e) { toast(e.message, 'error'); }
 }
 
